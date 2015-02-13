@@ -51,8 +51,9 @@ PROGRAM Fisher_Distance
   !filename = 'SKA2_Real_Corrected_nz_Srms_2.txt'
   !filename =  'SKA2_Pess_Corrected_nz_Srms_2.txt'!
   !filename= '/home/ubuntu/Dropbox/SKA Survey/Fishers/fisher_distance_bao/Fisher_bao_SKA_Euclid/inputs/number_EuclidmJy_ref.txt'
+  !filename = 'number_BOSS_S5000.txt'
   open(2,file=filename,status='unknown')
-  
+
   !=============  Read in linear P(k) ===================================
   !filename='linear_matterpower_1.dat' 
   filename= 'deriv_mikrom_dfbao_dk.dat'
@@ -71,6 +72,7 @@ PROGRAM Fisher_Distance
   nbins =0    ! initialize the number of bins
   !=========== Loop over redshift bins =======================================
   do ibin=1,100
+     !read(2,*,end=10)z ,dndz,bias,kmax_ov_h,kmin_ov_h, Vsurvey , dvdz2! uncomment for BOSS
      !read(2,*,end=10)z ,dndz,bias,kmax_ov_h,kmin_ov_h,delta_v, Vsurvey , dvdz2! uncomment for Euclid ref
      read(2,*,end=10) z ,dndz,bias, kmax_ov_h, Vsurvey, dvdz2! Uncomment for SKA
      nbins=nbins+1
@@ -80,12 +82,12 @@ PROGRAM Fisher_Distance
      !ngal  = dndz  		  		! Uncomment for  Euclid
      dvdz2 = dvdz2*(H_0/100d0)**3 		! convert the comoving volume to Mpc^3 h^-3 Uncomment for SKA
      ngal = dndz/((3.14159d0/180d0)**2*dvdz2) 	! Uncomment for SKA or Euclid new
-     Ngl   = (dndz * Vsurvey) ! for Euclid
+     Ngl   = (ngal * Vsurvey) ! for Euclid
      Ntot  = Ntot + Ngl 
      Vtot  = Vtot+Vsurvey ! h^-3 Mpc^3.
      !==================Test the growth =================================
-     !open(101,file='test_all_terms_Euclid.txt' ,status='unknown')
-     !write(101,*) z, ngal, Vsurvey, g(z) , beta*bias, bias, beta!, D_plus!/(1d0+z), (1d0+dgdlna(z)/g(z))
+     !open(101,file='test_all_terms_SKA1.txt' ,status='unknown')
+     !write(101,*) z, ngal, bias!, D_plus!/(1d0+z), (1d0+dgdlna(z)/g(z))
      !write(101,*) z, Vsurvey, dvdz2, dndz, ngal, bias, beta, beta*bias, g(z)
      !=================  computing the Fisher matrix... =================================
      open(11,file=filename,status='old')
@@ -113,7 +115,7 @@ PROGRAM Fisher_Distance
              mu2= mu*mu
 	     
              !P02 is P(k) at k=0.2 h Mpc^-1 in unitys of h^-3 Mpc^3
-             p02 = 848.536902895
+             !p02 = 848.536902895
              p02 =p02*(g(z)/g(zin)*(1d0+zin)/(1d0+z))**2d0 &
               *bias**2d0*(1d0+beta*mu2)**2d0
              
@@ -144,8 +146,8 @@ PROGRAM Fisher_Distance
     	!open(16,file='cosmic_v_k_Euclid_fis_test_7.txt' ,status='unknown')
     	!write(16,*) k_ov_h,  dsqrt(1d0/fistest)!
     	
-        open(100,file='cosmic_variance_5.txt' ,status='unknown')
-        write(100,*) z , ((1d0/P02)*dvdz2 ), (dndz*((3.14159d0/180d0)**2*dvdz2))
+        !open(100,file='cosmic_variance_5.txt' ,status='unknown')
+        !write(100,*) z , ((1d0/P02)*dvdz2 ), (dndz*((3.14159d0/180d0)**2*dvdz2))
        !======================================================================
     k0_ov_h=k_ov_h
     enddo
@@ -208,16 +210,18 @@ SUBROUTINE report_result(z,bias,npara,fis)
        /(1d0+2d0*r12*err_lnda/err_lnh+(err_lnda/err_lnh)**2d0))
   !==============save desired fisher files =======================
   !open(12,file='Fisher_bao_Real_150_Srms_corrected_nz_test.txt' ,status='unknown')
-  open(12,file='Fisher_bao_0n_Srms_s30k.txt' ,status='unknown')
+  !open(12,file='Fisher_bao_0n_Srms_s30k.txt' ,status='unknown')
   !open(12,file='Fisher_bao_Euclid_s15k_3.txt' ,status='unknown')
-  !open(12,file='Fisher_bao_Euclid_new_2.txt' ,status='unknown') 
+  !open(12,file='Fisher_bao_Euclid_new_2.txt' ,status='unknown')
+  !open(12,file ='Fisher_bao_BOSS_S5000_bias.txt', status='unknown') 
   !write(12,*) 'z',  'fis(1,1)', 'fis(1,2)', 'fis(2,1)', 'fis(2,2)'
   !write(12,*) z,  fis(1,1), fis(1,2), fis(2,1), fis(2,2)
-  write(12,'(4F18.5)') err_lnda,err_lnh,err_lnR
+  !write(12,'(4F18.5)') err_lnda,err_lnh,err_lnR
   !open(13,file='output_Fisher_bao_Pess_23_Srms_corrected_nz_2.txt', status='unknown')
   !open(13,file='output_Fisher_bao_0n_rms_s30k.txt' ,status='unknown')
   !open(13,file='output_Fisher_bao_Euclid_s15k_3.txt', status='unknown')
   !open(13,file='output_Fisher_bao_Euclid_new_2.txt', status='unknown')
+  !open(13,file='output_Fisher_bao_BOSS_S5000_bias.txt', status='unknown')
   !write(13,'(6F18.5)') z, err_lnda*1d2,err_lnh*1d2,err_lnR*1d2, beta
   !========================================================
   print'(1A15,1F9.5)','Err[lnDa](%) =',err_lnda*1d2
@@ -241,7 +245,7 @@ SUBROUTINE report_result3x3(fis)
   A = fis
   DET2x2 =  A(1,1)*A(2,2) - A(1,2)*A(2,1)  
   write(12,*)'*** Error on w, with  Om0, ob0, ok0 and  H0 marginalized over ***'
-  write(12,*) 'The Fisher Matrix = ', '[', 0.0, 0.0 ,    0.,  0., 0. , 0.,  0. ,  ';'&
+  write(*,*) 'The Fisher Matrix = ', '[', 0.0, 0.0 ,    0.,  0., 0. , 0.,  0. ,  ';'&
     ,0., A(1,1) ,    A(1,2),  A(1,3) , A(1,4),  A(1,5), A(1,6),  ';'&
    ,0.,  A(2,1) ,  A(2,2),  A(2,3), A(2,4),  A(2,5), A(2,6), ';' &
    ,0.,  A(3,1),  A(3,2),  A(3,3), A(3,4),  A(3,5),  A(3,6),  ';'  &

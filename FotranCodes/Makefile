@@ -1,5 +1,5 @@
 FC	= gfortran
-FFLAGS	= -O3 
+FFLAGS	= -O3  /usr/lib/crt1.o /usr/lib/libc.dylib
 OBJS	= cosmo.o da.o growth.o linearpk.o spline.o hunt.o dvert.o dverk.o  rombint.o 
 .SUFFIXES: .f90
 .f90.o: 
